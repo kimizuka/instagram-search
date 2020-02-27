@@ -24,7 +24,7 @@ app.on('ready', function() {
 
       const $ = cheerio.load(html);
 
-      await $('a').each((_, elm) => {
+      $('a').each((_, elm) => {
         const href = $(elm).attr('href');
 
         if (/instagram\.com\/p/.test(href)) {

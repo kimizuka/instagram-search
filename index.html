@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>instagram-search</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" />
+  <meta name="generator" content="Sublime Text 3" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <style>
+    #result {
+      display: flex;
+      flex-wrap: wrap;
+    }
+    img {
+      width: 25%;
+    }
+  </style>
+</head>
+<body>
+  <input id="input" type="text" />
+  <button id="button">Search</button>
+  <div id="result"></div>
+  <script>
+    const ipcRenderer = require("electron").ipcRenderer;
+
+    ipcRenderer.on('result', (_, evt) => {
+      const img = new Image;
+
+      img.src = evt;
+      document.getElementById('result').appendChild(img);
+    });
+
+    document.getElementById('button').addEventListener('click', (evt) => {
+      document.getElementById('result').innerHTML = '';
+      ipcRenderer.send('search', document.getElementById('input').value);
+    })
+  </script>
+</body>
+</html>

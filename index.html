@@ -10,9 +10,14 @@
     #result {
       display: flex;
       flex-wrap: wrap;
+      justify-content: space-around;
     }
-    img {
-      width: 25%;
+    #result > div {
+      margin: 8px 0;
+      width: calc(100% / 3);
+    }
+    #result > div > iframe {
+      margin: auto !important;
     }
   </style>
 </head>
@@ -22,12 +27,24 @@
   <div id="result"></div>
   <script>
     const ipcRenderer = require("electron").ipcRenderer;
+    let timer;
 
     ipcRenderer.on('result', (_, evt) => {
-      const img = new Image;
+      const div = document.createElement('div');
 
-      img.src = evt;
-      document.getElementById('result').appendChild(img);
+      div.innerHTML = `<blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/${ evt }/?utm_source=ig_embed&amp;utm_campaign=loading" data-instgrm-version="12"></blockquote>`;
+
+      document.getElementById('result').appendChild(div);
+
+      clearInterval(timer);
+
+      timer = setTimeout(() => {
+        const script = document.createElement('script');
+
+        script.src = 'https://www.instagram.com/embed.js';
+
+        document.body.appendChild(script);
+      }, 5000);
     });
 
     document.getElementById('button').addEventListener('click', (evt) => {

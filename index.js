@@ -5,7 +5,7 @@ const { app, ipcMain, BrowserWindow } = require('electron');
 
 app.on('ready', function() {
   const mainWindow = new BrowserWindow({
-    width  : 800,
+    width  : 1040,
     height : 800,
     webPreferences: {
       nodeIntegration: true
@@ -17,7 +17,7 @@ app.on('ready', function() {
       const browser = await puppeteer.launch();
       const page = await browser.newPage();
 
-      await page.goto(`https://www.google.com/search?q=site%3Ainstagram.com+${encodeURIComponent(txt)}`);
+      await page.goto(`https://www.google.com/search?q=site%3Ainstagram.com+${ encodeURIComponent('リノベーション ' + txt) }`);
 
       const bodyHandle = await page.$('body');
       const html = await page.evaluate(body => body.innerHTML, bodyHandle);
@@ -27,20 +27,24 @@ app.on('ready', function() {
       $('a').each((_, elm) => {
         const href = $(elm).attr('href');
 
-        if (/instagram\.com\/p/.test(href)) {
+        if (/instagram\.com\//.test(href)) {
           (async () => {
             const browser = await puppeteer.launch();
             const page = await browser.newPage();
 
             await page.goto(href);
+            await page.waitFor(5000);
 
             const bodyHandle = await page.$('body');
             const html = await page.evaluate(body => body.innerHTML, bodyHandle);
-
             const $ = cheerio.load(html);
 
-            $('[style="padding-bottom: 100%;"] > img').each((_, elm) => {
-              mainWindow && mainWindow.webContents.send('result', $(elm).attr('src'));
+            $('a').each((_, elm) => {
+              const href = $(elm).attr('href');
+
+              if (/\/p\/(.+)/.test(href)) {
+                mainWindow && mainWindow.webContents.send('result', href.replace(/^\/p\//, '').replace(/\/$/, ''));
+              }
             });
           })();
         }
@@ -52,5 +56,5 @@ app.on('ready', function() {
     app.quit();
   });
 
-  mainWindow.loadURL('file://' + __dirname + '/index.html');
+  mainWindow.loadURL(`file://${__dirname}/index.html`);
 });
